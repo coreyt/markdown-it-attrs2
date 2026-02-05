@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "markdown-it": "^14.1.0",
+    "markdown-it-attributes": "^1.2.0",
     "markdown-it-attrs": "^4.3.1"
   }
 }

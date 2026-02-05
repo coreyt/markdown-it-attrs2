@@ -9,6 +9,7 @@ const optimizedAttrs = require('./optimized-attrs.js');
 const optimizedAttrsV2 = require('./optimized-attrs-v2.js');
 const optimizedAttrsV3 = require('./optimized-attrs-v3.js');
 const liteAttrs = require('./optimized-attrs-lite.js');
+const puroceanAttrs = require('markdown-it-attributes').default; // purocean's "132x faster" impl
 
 // Generate test documents of varying complexity
 function generateSimpleDoc(lines) {
@@ -133,18 +134,24 @@ function runBenchmarks() {
     const mdLite = new MarkdownIt().use(liteAttrs);
     const liteResult = benchmark('Lite', () => mdLite.render(doc));
 
+    // Purocean's "132x faster" implementation
+    const mdPurocean = new MarkdownIt().use(puroceanAttrs);
+    const puroceanResult = benchmark('Purocean', () => mdPurocean.render(doc));
+
     // Verify outputs match (for correctness)
     const originalOutput = mdOriginal.render(doc);
     const v1Match = originalOutput === mdOptimized.render(doc);
     const v2Match = originalOutput === mdOptimizedV2.render(doc);
     const v3Match = originalOutput === mdOptimizedV3.render(doc);
     const liteMatch = originalOutput === mdLite.render(doc);
+    const puroceanMatch = originalOutput === mdPurocean.render(doc);
 
     console.log(`\n  Original:     ${originalResult.median.toFixed(3)} ms (median)`);
     console.log(`  Optimized v1: ${optimizedResult.median.toFixed(3)} ms  ${(originalResult.median / optimizedResult.median).toFixed(1)}x  ${v1Match ? '✓' : '✗'}`);
     console.log(`  Optimized v2: ${optimizedV2Result.median.toFixed(3)} ms  ${(originalResult.median / optimizedV2Result.median).toFixed(1)}x  ${v2Match ? '✓' : '✗'}`);
     console.log(`  Optimized v3: ${optimizedV3Result.median.toFixed(3)} ms  ${(originalResult.median / optimizedV3Result.median).toFixed(1)}x  ${v3Match ? '✓' : '✗'}`);
     console.log(`  Lite:         ${liteResult.median.toFixed(3)} ms  ${(originalResult.median / liteResult.median).toFixed(1)}x  ${liteMatch ? '✓' : '✗ (common patterns only)'}`);
+    console.log(`  Purocean:     ${puroceanResult.median.toFixed(3)} ms  ${(originalResult.median / puroceanResult.median).toFixed(1)}x  ${puroceanMatch ? '✓' : '✗'} (claimed 132x)`);
   }
 
   console.log('\n' + '='.repeat(70));
