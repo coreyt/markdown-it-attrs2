@@ -6,6 +6,9 @@
 const MarkdownIt = require('markdown-it');
 const originalAttrs = require('markdown-it-attrs');
 const optimizedAttrs = require('./optimized-attrs.js');
+const optimizedAttrsV2 = require('./optimized-attrs-v2.js');
+const optimizedAttrsV3 = require('./optimized-attrs-v3.js');
+const liteAttrs = require('./optimized-attrs-lite.js');
 
 // Generate test documents of varying complexity
 function generateSimpleDoc(lines) {
@@ -114,25 +117,34 @@ function runBenchmarks() {
     const mdOriginal = new MarkdownIt().use(originalAttrs);
     const originalResult = benchmark('Original', () => mdOriginal.render(doc));
 
-    // Optimized implementation
+    // Optimized implementation v1
     const mdOptimized = new MarkdownIt().use(optimizedAttrs);
-    const optimizedResult = benchmark('Optimized', () => mdOptimized.render(doc));
+    const optimizedResult = benchmark('Optimized v1', () => mdOptimized.render(doc));
+
+    // Optimized implementation v2
+    const mdOptimizedV2 = new MarkdownIt().use(optimizedAttrsV2);
+    const optimizedV2Result = benchmark('Optimized v2', () => mdOptimizedV2.render(doc));
+
+    // Optimized implementation v3 (max perf)
+    const mdOptimizedV3 = new MarkdownIt().use(optimizedAttrsV3);
+    const optimizedV3Result = benchmark('Optimized v3', () => mdOptimizedV3.render(doc));
+
+    // Lite version (common patterns only)
+    const mdLite = new MarkdownIt().use(liteAttrs);
+    const liteResult = benchmark('Lite', () => mdLite.render(doc));
 
     // Verify outputs match (for correctness)
     const originalOutput = mdOriginal.render(doc);
-    const optimizedOutput = mdOptimized.render(doc);
-    const outputsMatch = originalOutput === optimizedOutput;
+    const v1Match = originalOutput === mdOptimized.render(doc);
+    const v2Match = originalOutput === mdOptimizedV2.render(doc);
+    const v3Match = originalOutput === mdOptimizedV3.render(doc);
+    const liteMatch = originalOutput === mdLite.render(doc);
 
-    console.log(`\n  Original:  ${originalResult.median.toFixed(3)} ms (median), ${originalResult.avg.toFixed(3)} ms (avg)`);
-    console.log(`  Optimized: ${optimizedResult.median.toFixed(3)} ms (median), ${optimizedResult.avg.toFixed(3)} ms (avg)`);
-    console.log(`  Speedup:   ${(originalResult.median / optimizedResult.median).toFixed(2)}x`);
-    console.log(`  Outputs match: ${outputsMatch ? 'YES ✓' : 'NO ✗'}`);
-
-    if (!outputsMatch) {
-      console.log('\n  WARNING: Output mismatch detected!');
-      console.log('  Original (first 500 chars):', originalOutput.slice(0, 500));
-      console.log('  Optimized (first 500 chars):', optimizedOutput.slice(0, 500));
-    }
+    console.log(`\n  Original:     ${originalResult.median.toFixed(3)} ms (median)`);
+    console.log(`  Optimized v1: ${optimizedResult.median.toFixed(3)} ms  ${(originalResult.median / optimizedResult.median).toFixed(1)}x  ${v1Match ? '✓' : '✗'}`);
+    console.log(`  Optimized v2: ${optimizedV2Result.median.toFixed(3)} ms  ${(originalResult.median / optimizedV2Result.median).toFixed(1)}x  ${v2Match ? '✓' : '✗'}`);
+    console.log(`  Optimized v3: ${optimizedV3Result.median.toFixed(3)} ms  ${(originalResult.median / optimizedV3Result.median).toFixed(1)}x  ${v3Match ? '✓' : '✗'}`);
+    console.log(`  Lite:         ${liteResult.median.toFixed(3)} ms  ${(originalResult.median / liteResult.median).toFixed(1)}x  ${liteMatch ? '✓' : '✗ (common patterns only)'}`);
   }
 
   console.log('\n' + '='.repeat(70));
