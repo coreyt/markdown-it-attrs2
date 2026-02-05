@@ -1,21 +1,49 @@
 {
   "name": "markdown-it-attrs2",
   "version": "1.0.0",
-  "description": "",
+  "description": "Optimized attribute parsing for markdown-it (4-7x faster than markdown-it-attrs)",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./lite": "./lite.js",
+    "./full": "./full.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node benchmark.js",
+    "benchmark": "node benchmark.js"
   },
   "repository": {
     "type": "git",
-    "url": "http://local_proxy@127.0.0.1:32933/git/coreyt/markdown-it-attrs2"
+    "url": "https://github.com/coreyt/markdown-it-attrs2"
   },
-  "keywords": [],
+  "keywords": [
+    "markdown-it",
+    "plugin",
+    "attributes",
+    "class",
+    "id",
+    "performance",
+    "optimized"
+  ],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
+  "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
+  "peerDependencies": {
+    "markdown-it": ">=12.0.0"
+  },
+  "devDependencies": {
     "markdown-it": "^14.1.0",
     "markdown-it-attributes": "^1.2.0",
     "markdown-it-attrs": "^4.3.1"
-  }
+  },
+  "files": [
+    "index.js",
+    "lite.js",
+    "full.js",
+    "optimized-attrs-lite.js",
+    "optimized-attrs-v4.js",
+    "PERFORMANCE_ANALYSIS.md"
+  ]
 }
