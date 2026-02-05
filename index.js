@@ -2,14 +2,14 @@
 /**
  * markdown-it-attrs2 - Optimized attribute parsing for markdown-it
  *
- * Default export: Lite version (4-7x faster, handles common patterns)
+ * 100% compatible with markdown-it-attrs, 3-7x faster.
  *
- * For full compatibility with all edge cases, use:
- *   const attrs = require('markdown-it-attrs2/full');
+ * Usage:
+ *   const md = require('markdown-it')();
+ *   const attrs = require('markdown-it-attrs2');
+ *   md.use(attrs);
  *
- * Available variants:
- *   - require('markdown-it-attrs2')      - Lite (default, fastest)
- *   - require('markdown-it-attrs2/lite') - Same as default
- *   - require('markdown-it-attrs2/full') - Full compatibility (v3)
+ * For the fastest option (common patterns only), use:
+ *   const attrs = require('markdown-it-attrs2/lite');
  */
-module.exports = require('./optimized-attrs-lite');
+module.exports = require('./optimized-attrs-v4');

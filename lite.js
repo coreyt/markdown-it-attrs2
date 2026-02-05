@@ -1,19 +1,18 @@
 'use strict';
 /**
- * Lite version - fastest option (4-7x faster)
+ * Lite version - maximum speed (~20% faster than full)
  *
- * Handles:
- * - Heading attrs:     # Heading {.class}
- * - Paragraph attrs:   text {.class #id}
- * - Code fence attrs:  ```lang {.class}
- * - Inline attrs:      *em*{.class}, `code`{.class}, ![](img){.class}
+ * Handles common patterns:
+ * - Headings:      # Heading {.class}
+ * - Paragraphs:    text {.class #id}
+ * - Code fences:   ```lang {.class}
+ * - Inline:        *em*{.class}, `code`{.class}, ![](img){.class}
  *
- * NOT supported:
- * - Table attrs:       | table |\n{.class}  (use 'full' version)
- * - List item end:     - item {.class}
- * - List softbreak:    - item\n{.class}
- * - Horizontal rule:   --- {#id}
+ * Does not handle:
+ * - Table attrs
+ * - List item attrs
+ * - Softbreak attrs
  *
- * Performance: 4-7x faster than original
+ * Use require('markdown-it-attrs2') for full compatibility.
  */
 module.exports = require('./optimized-attrs-lite');
