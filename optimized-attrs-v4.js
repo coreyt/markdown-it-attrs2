@@ -245,7 +245,57 @@ module.exports = function maxPerfAttrsV4(md, options_) {
           }
         }
 
-        // End of block pattern
+        // ═══════════════════════════════════════════════════════════════════
+        // Softbreak pattern: text\n{.class}
+        // ═══════════════════════════════════════════════════════════════════
+        if (children.length >= 2) {
+          const last = children[children.length - 1];
+          const secondLast = children[children.length - 2];
+          if (secondLast.type === 'softbreak' && last.type === 'text') {
+            const ct = last.content;
+            // Check if content is ONLY attrs: {.class}
+            if (ct.charCodeAt(0) === LEFT_CODE && ct.charCodeAt(ct.length - 1) === RIGHT_CODE) {
+              const attrs = parseAttrsInRange(ct, 0, ct.length - RIGHT_LEN);
+              if (attrs) {
+                // Find the closing block token and apply to its opening
+                let ii = i + 1;
+                while (ii + 1 < len && tokens[ii + 1].nesting === -1) ii++;
+                const open = findOpen(tokens, ii);
+                if (open) {
+                  applyAttrs(attrs, open);
+                  // Remove softbreak and text children
+                  children.length = children.length - 2;
+                  continue;
+                }
+              }
+            }
+          }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // List item end pattern: - item {.class}
+        // Must check BEFORE general end-of-block pattern
+        // ═══════════════════════════════════════════════════════════════════
+        if (i >= 2 && tokens[i - 2].type === 'list_item_open' && children.length > 0) {
+          const last = children[children.length - 1];
+          if (last.type === 'text' && last.content) {
+            const ct = last.content;
+            const start = ct.lastIndexOf(LEFT);
+            if (start !== -1 && ct.charCodeAt(ct.length - 1) === RIGHT_CODE) {
+              const attrs = parseAttrsInRange(ct, start, ct.length - RIGHT_LEN);
+              if (attrs) {
+                // Apply to list_item_open, not the paragraph
+                applyAttrs(attrs, tokens[i - 2]);
+                let newEnd = start;
+                if (ct.charCodeAt(newEnd - 1) === 32) newEnd--;
+                last.content = ct.substring(0, newEnd);
+                continue; // Skip general end-of-block pattern
+              }
+            }
+          }
+        }
+
+        // End of block pattern (general case)
         if (children.length > 0) {
           const last = children[children.length - 1];
           if (last.type === 'text' && last.content) {
